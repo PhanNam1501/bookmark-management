@@ -14,6 +14,7 @@ const (
 type passwordService struct {
 }
 
+//go:generate mockery --name Password --filename pass_service.go
 type Password interface {
 	GeneratePassword() (string, error)
 }
