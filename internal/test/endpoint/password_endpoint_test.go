@@ -26,7 +26,7 @@ func TestPasswordEndpoint(t *testing.T) {
 			setupTestHTTP: func(api api.Engine) *httptest.ResponseRecorder {
 				req := httptest.NewRequest(http.MethodGet, "/gen-pass", nil)
 				respRec := httptest.NewRecorder()
-				api.ServeHttp(respRec, req)
+				api.ServeHTTP(respRec, req)
 				return respRec
 			},
 
@@ -38,8 +38,11 @@ func TestPasswordEndpoint(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-
-			app := api.New()
+			cfg, err := api.NewConfig("")
+			if err != nil {
+				panic(err)
+			}
+			app := api.New(cfg)
 			rec := tc.setupTestHTTP(app)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)

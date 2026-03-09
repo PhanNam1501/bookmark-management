@@ -33,7 +33,7 @@ func TestPasswordService_GeneratePassword(t *testing.T) {
 			testSvc := NewPassword()
 			pass, err := testSvc.GeneratePassword()
 
-			assert.Equal(t, tc.expectedLen, 10)
+			assert.Equal(t, tc.expectedLen, len(pass))
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, urlSafeRegex.MatchString(pass), true)
 		})
