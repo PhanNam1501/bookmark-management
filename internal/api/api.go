@@ -11,6 +11,8 @@ import (
 
 type Engine interface {
 	Start() error
+	registerEP()
+	createUUID()
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
@@ -25,7 +27,7 @@ func New(cfg *Config) Engine {
 		cfg: cfg,
 	}
 	a.registerEP()
-	a.getId()
+	a.createUUID()
 	return a
 }
 
@@ -39,12 +41,12 @@ func (a *api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (a *api) registerEP() {
 	passSvc := service.NewPassword()
-	passHandler := handler.NewPassword(passSvc)
+	passHandler := handler.NewPasswordHandler(passSvc)
 	a.app.GET("/gen-pass", passHandler.GenPass)
 }
 
-func (a *api) getId() {
-	idSvc := service.NewId()
-	idHander := handler.NewHealthCheck(idSvc)
-	a.app.GET("/health-check", idHander.GenId)
+func (a *api) createUUID() {
+	bookmarkSvc := service.NewBookmark()
+	bookmarkHandler := handler.NewBookmarkHandler(bookmarkSvc)
+	a.app.GET("/health-check", bookmarkHandler.GenUuid)
 }

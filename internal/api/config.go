@@ -6,9 +6,9 @@ type Config struct {
 	AppPort string `default:"8080" envconfig:"APP_PORT"`
 }
 
-func NewConfig(envPrefix string) (*Config, error) {
+func NewConfig() (*Config, error) {
 	cfg := &Config{}
-	err := envconfig.Process(envPrefix, cfg)
+	err := envconfig.Process("", cfg)
 	if err != nil {
 		return nil, err
 	}

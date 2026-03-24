@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/magiconair/properties/assert"
+	"github.com/go-openapi/testify/v2/assert"
 )
 
 var urlSafeRegex = regexp.MustCompile(`^[A-Za-z0-9]+$`)
@@ -19,8 +19,7 @@ func TestPasswordService_GeneratePassword(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name: "normal case",
-
+			name:        "normal case",
 			expectedLen: 10,
 			expectedErr: nil,
 		},
@@ -31,6 +30,7 @@ func TestPasswordService_GeneratePassword(t *testing.T) {
 			t.Parallel()
 
 			testSvc := NewPassword()
+
 			pass, err := testSvc.GeneratePassword()
 
 			assert.Equal(t, tc.expectedLen, len(pass))

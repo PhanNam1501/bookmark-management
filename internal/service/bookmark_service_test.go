@@ -3,10 +3,10 @@ package service
 import (
 	"testing"
 
-	"github.com/magiconair/properties/assert"
+	"github.com/go-openapi/testify/v2/assert"
 )
 
-func TestIdService_GenerateId(t *testing.T) {
+func TestBookmarkService(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -15,8 +15,7 @@ func TestIdService_GenerateId(t *testing.T) {
 		expectedLen int
 	}{
 		{
-			name: "normal case",
-
+			name:        "normal case",
 			expectedLen: 36,
 		},
 	}
@@ -25,10 +24,10 @@ func TestIdService_GenerateId(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testSvc := NewId()
-			id := testSvc.GetId()
+			testSvc := NewBookmark()
+			uuid := testSvc.GenerateUuid()
 
-			assert.Equal(t, tc.expectedLen, len(id))
+			assert.Equal(t, tc.expectedLen, len(uuid))
 		})
 	}
 }

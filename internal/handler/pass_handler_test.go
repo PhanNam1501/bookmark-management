@@ -8,67 +8,74 @@ import (
 
 	"github.com/PhanNam1501/bookmark-management/internal/service/mocks"
 	"github.com/gin-gonic/gin"
-	"github.com/magiconair/properties/assert"
+	"github.com/go-openapi/testify/v2/assert"
 )
 
-func TestPasswordHandler_GenPass(t *testing.T) {
+func TestPasswordHandler(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
 		name string
 
-		setupRequest func(ctx *gin.Context)
+		setupRequest func() (*gin.Context, *httptest.ResponseRecorder)
 		setupMockSvc func() *mocks.Password
 
 		expectedStatus int
-		expectResp     string
+		expectedResp   string
 	}{
 		{
 			name: "success",
-
-			setupRequest: func(ctx *gin.Context) {
-				ctx.Request = httptest.NewRequest(http.MethodGet, "/gen-pass", nil)
+			// clean
+			setupRequest: func() (*gin.Context, *httptest.ResponseRecorder) {
+				rec := httptest.NewRecorder()
+				gc, _ := gin.CreateTestContext(rec)
+				gc.Request = httptest.NewRequest(http.MethodGet, "/gen-pass", nil)
+				return gc, rec
 			},
 			setupMockSvc: func() *mocks.Password {
 				svcMock := mocks.NewPassword(t)
-				svcMock.On("GeneratePassword").Return("123456789", nil)
+				svcMock.On("GeneratePassword").Return("123456789", nil) //have input -> , , , ,
 				return svcMock
 			},
+
 			expectedStatus: http.StatusOK,
-			expectResp:     "123456789",
+			expectedResp:   "123456789",
 		},
 
 		{
 			name: "internal server err",
 
-			setupRequest: func(ctx *gin.Context) {
-				ctx.Request = httptest.NewRequest(http.MethodGet, "/gen-pass", nil)
+			setupRequest: func() (*gin.Context, *httptest.ResponseRecorder) {
+				rec := httptest.NewRecorder()
+				gc, _ := gin.CreateTestContext(rec)
+				gc.Request = httptest.NewRequest(http.MethodGet, "/gen-pass", nil)
+				return gc, rec
 			},
 			setupMockSvc: func() *mocks.Password {
 				svcMock := mocks.NewPassword(t)
-				svcMock.On("GeneratePassword").Return("123456789", errors.New("random"))
+				svcMock.On("GeneratePassword").Return("", errors.New("something")) //have input -> , , , ,
 				return svcMock
 			},
+
 			expectedStatus: http.StatusInternalServerError,
-			expectResp:     "err",
+			expectedResp:   "err",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-
-			rec := httptest.NewRecorder()
-			gc, _ := gin.CreateTestContext(rec)
-
-			tc.setupRequest(gc)
+			// fake responsewriter
+			// rec := httptest.NewRecorder()
+			// gc, _ := gin.CreateTestContext(rec)
+			gc, rec := tc.setupRequest()
 			mockSvc := tc.setupMockSvc()
-			testHandler := NewPassword(mockSvc)
+			testHandler := NewPasswordHandler(mockSvc)
 
 			testHandler.GenPass(gc)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)
-			assert.Equal(t, tc.expectResp, rec.Body.String())
+			assert.Equal(t, tc.expectedResp, rec.Body.String())
 		})
 	}
 }

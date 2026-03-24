@@ -15,16 +15,10 @@ type Password interface {
 	GenPass(c *gin.Context)
 }
 
-func NewPassword(svc service.Password) Password {
+func NewPasswordHandler(svc service.Password) Password {
 	return &passwordHandler{svc: svc}
 }
 
-// GenPass godoc
-// @Summary Generate password
-// @Tags Password
-// @Produce json
-// @Success 200 {object} string
-// @Router /gen-pass [get]
 func (h *passwordHandler) GenPass(c *gin.Context) {
 	pass, err := h.svc.GeneratePassword()
 	if err != nil {
