@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/PhanNam1501/bookmark-management/internal/api"
+	redisPkg "github.com/PhanNam1501/bookmark-management/pkg/redis"
 	"github.com/go-openapi/testify/v2/assert"
 )
 
@@ -39,12 +40,17 @@ func TestPasswordEndpoint(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			cfg, err := api.NewConfig()
+			cfg, err := api.NewConfig("")
 			if err != nil {
 				panic(err)
 			}
 
-			app := api.New(cfg)
+			redisClient, err := redisPkg.NewClient("")
+			if err != nil {
+				panic(err)
+			}
+
+			app := api.New(cfg, redisClient)
 			rec := tc.setupTestHttp(app)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)

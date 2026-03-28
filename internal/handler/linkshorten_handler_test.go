@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/PhanNam1501/bookmark-management/internal/service/mocks"
@@ -12,39 +13,52 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestBookmarkHandler(t *testing.T) {
+func TestLinkShortenURLHandler(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
 		name string
 
 		setupRequest func() (*gin.Context, *httptest.ResponseRecorder)
-		setupMockSvc func() *mocks.Bookmark
+		setupMockSvc func() *mocks.ShortenURL
 
 		expectedStatus int
-		expectedResp   BaseResponse
+		expectedLen    int
+		expectedResp   LinkShortenURLResponse
 	}{
 		{
 			name: "success",
 			setupRequest: func() (*gin.Context, *httptest.ResponseRecorder) {
 				rec := httptest.NewRecorder()
 				gc, _ := gin.CreateTestContext(rec)
-				gc.Request = httptest.NewRequest(http.MethodGet, "/health-check", nil)
+
+				body := `{
+					"exp": 64000,
+					"url": "http://google.com"
+				}`
+
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", strings.NewReader(body))
+				req.Header.Set("Content-Type", "application/json")
+
+				gc.Request = req
 				return gc, rec
 			},
-
-			setupMockSvc: func() *mocks.Bookmark {
-				svcMock := mocks.NewBookmark(t)
-				svcMock.On("GenerateUuid").Return("15012004") //have input -> , , , ,
-				svcMock.On("CheckRedisConnection", mock.Anything).Return(nil)
+			setupMockSvc: func() *mocks.ShortenURL {
+				svcMock := mocks.NewShortenURL(t)
+				svcMock.On(
+					"LinkShortenURL",
+					mock.Anything,
+					"http://google.com",
+					64000,
+				).Return("1234567890", nil)
 				return svcMock
 			},
 
 			expectedStatus: http.StatusOK,
-			expectedResp: BaseResponse{
-				Message:     "OK",
-				ServiceName: "bookmark_service",
-				InstanceID:  "15012004",
+			expectedLen:    10,
+			expectedResp: LinkShortenURLResponse{
+				Code:    "1234567890",
+				Message: "Shorten URL generated successfully!",
 			},
 		},
 	}
@@ -54,11 +68,11 @@ func TestBookmarkHandler(t *testing.T) {
 			t.Parallel()
 			gc, rec := tc.setupRequest()
 			mockSvc := tc.setupMockSvc()
-			testHandler := NewBookmarkHandler(mockSvc)
+			testHandler := NewLinkShortenHandler(mockSvc)
 
-			testHandler.GenUuid(gc)
+			testHandler.LinkShortenURL(gc)
 			assert.Equal(t, tc.expectedStatus, rec.Code)
-			var resp BaseResponse
+			var resp LinkShortenURLResponse
 			json.Unmarshal(rec.Body.Bytes(), &resp)
 			assert.Equal(t, tc.expectedResp, resp)
 		})

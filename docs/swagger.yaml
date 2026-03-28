@@ -1,0 +1,111 @@
+basePath: /
+definitions:
+  handler.BaseResponse:
+    properties:
+      instance_id:
+        type: string
+      message:
+        type: string
+      service_name:
+        type: string
+    type: object
+  handler.linkShortenURLRequest:
+    properties:
+      exp:
+        type: integer
+      url:
+        type: string
+    type: object
+  handler.shortenURLRequest:
+    properties:
+      url:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Bookmark API
+  title: Bookmark API
+  version: "1.0"
+paths:
+  /gen-pass:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Generate password
+      tags:
+      - Password
+  /health-check:
+    get:
+      consumes:
+      - application/json
+      description: Check Redis connection and return a unique instance ID if service
+        is healthy
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Service is healthy
+          schema:
+            $ref: '#/definitions/handler.BaseResponse'
+        "500":
+          description: Redis connection failed
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check + generate instance UUID
+      tags:
+      - Bookmark
+  /shorten:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.shortenURLRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Shorten URL
+      tags:
+      - ShortenURL
+  /v1/links/shorten:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.linkShortenURLRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Link Shorten URL
+      tags:
+      - LinkShortenURL
+swagger: "2.0"

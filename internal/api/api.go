@@ -4,30 +4,42 @@ import (
 	"fmt"
 	"net/http"
 
+	_ "github.com/PhanNam1501/bookmark-management/docs"
 	"github.com/PhanNam1501/bookmark-management/internal/handler"
+	"github.com/PhanNam1501/bookmark-management/internal/repository"
 	"github.com/PhanNam1501/bookmark-management/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Engine interface {
 	Start() error
 	registerEP()
 	createUUID()
+	shortenURL()
+	linkShortenURL()
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
 type api struct {
-	app *gin.Engine
-	cfg *Config
+	app         *gin.Engine
+	cfg         *Config
+	redisClient *redis.Client
 }
 
-func New(cfg *Config) Engine {
+func New(cfg *Config, redisClient *redis.Client) Engine {
 	a := &api{
-		app: gin.New(),
-		cfg: cfg,
+		app:         gin.Default(),
+		cfg:         cfg,
+		redisClient: redisClient,
 	}
 	a.registerEP()
 	a.createUUID()
+	a.shortenURL()
+	a.linkShortenURL()
+	a.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return a
 }
 
@@ -46,7 +58,26 @@ func (a *api) registerEP() {
 }
 
 func (a *api) createUUID() {
-	bookmarkSvc := service.NewBookmark()
+	urlStorage := repository.NewURLStorage(a.redisClient)
+	bookmarkSvc := service.NewBookmark(urlStorage)
 	bookmarkHandler := handler.NewBookmarkHandler(bookmarkSvc)
 	a.app.GET("/health-check", bookmarkHandler.GenUuid)
+}
+
+func (a *api) shortenURL() {
+	passwordSvc := service.NewPassword()
+	urlStorage := repository.NewURLStorage(a.redisClient)
+	shortenURLSvc := service.NewShortenURL(urlStorage, passwordSvc)
+	shortenURLHandler := handler.NewShortenURLHandler(shortenURLSvc)
+
+	a.app.POST("/shorten", shortenURLHandler.ShortenURL)
+}
+
+func (a *api) linkShortenURL() {
+	passwordSvc := service.NewPassword()
+	urlStorage := repository.NewURLStorage(a.redisClient)
+	shortenURLSvc := service.NewShortenURL(urlStorage, passwordSvc)
+	shortenURLHandler := handler.NewLinkShortenHandler(shortenURLSvc)
+
+	a.app.POST("/v1/links/shorten", shortenURLHandler.LinkShortenURL)
 }
