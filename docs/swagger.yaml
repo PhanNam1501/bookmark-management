@@ -9,17 +9,26 @@ definitions:
       service_name:
         type: string
     type: object
+  handler.RedirectURLResponse:
+    properties:
+      url:
+        type: string
+    type: object
   handler.linkShortenURLRequest:
     properties:
       exp:
         type: integer
       url:
         type: string
+    required:
+    - url
     type: object
   handler.shortenURLRequest:
     properties:
       url:
         type: string
+    required:
+    - url
     type: object
 host: localhost:8080
 info:
@@ -85,6 +94,40 @@ paths:
       summary: Shorten URL
       tags:
       - ShortenURL
+  /v1/links/redirect/{code}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the original long URL associated with the provided short
+        code from the path.
+      parameters:
+      - description: The unique short code (e.g., abc123X)
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved the URL
+          schema:
+            $ref: '#/definitions/handler.RedirectURLResponse'
+        "400":
+          description: Invalid or missing code in path
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Original URL
+      tags:
+      - Redirect
   /v1/links/shorten:
     post:
       consumes:

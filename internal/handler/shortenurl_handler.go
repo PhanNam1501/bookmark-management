@@ -22,7 +22,7 @@ func NewShortenURLHandler(svc service.ShortenURL) ShortenURL {
 }
 
 type shortenURLRequest struct {
-	URL string `json:"url"`
+	URL string `json:"url" binding:"required,url"`
 }
 
 type ShortenURLResponse struct {

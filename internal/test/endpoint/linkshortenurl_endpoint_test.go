@@ -1,8 +1,10 @@
 package endpoint
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/PhanNam1501/bookmark-management/internal/api"
@@ -10,7 +12,12 @@ import (
 	"github.com/go-openapi/testify/v2/assert"
 )
 
-func TestPasswordEndpoint(t *testing.T) {
+type LinkShortenURLResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func TestLinkShortenURLEndpoint(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -25,7 +32,11 @@ func TestPasswordEndpoint(t *testing.T) {
 			name: "success",
 
 			setupTestHttp: func(e api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodGet, "/gen-pass", nil)
+				body := `{
+					"exp": 64000,
+					"url": "http://google.com"
+				}`
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", strings.NewReader(body))
 				respRec := httptest.NewRecorder()
 				e.ServeHTTP(respRec, req)
 				return respRec
@@ -39,7 +50,6 @@ func TestPasswordEndpoint(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-
 			cfg, err := api.NewConfig("")
 			if err != nil {
 				panic(err)
@@ -55,7 +65,9 @@ func TestPasswordEndpoint(t *testing.T) {
 			rec := tc.setupTestHttp(app)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)
-			assert.Equal(t, tc.expectedRespLen, rec.Body.Len())
+			var resp LinkShortenURLResponse
+			json.Unmarshal(rec.Body.Bytes(), &resp)
+			assert.Equal(t, tc.expectedRespLen, len(resp.Code))
 		})
 	}
 }

@@ -102,6 +102,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/links/redirect/{code}": {
+            "get": {
+                "description": "Retrieve the original long URL associated with the provided short code from the path.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Redirect"
+                ],
+                "summary": "Get Original URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The unique short code (e.g., abc123X)",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved the URL",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RedirectURLResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing code in path",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/links/shorten": {
             "post": {
                 "consumes": [
@@ -154,8 +204,19 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.RedirectURLResponse": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.linkShortenURLRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "exp": {
                     "type": "integer"
@@ -167,6 +228,9 @@ const docTemplate = `{
         },
         "handler.shortenURLRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "url": {
                     "type": "string"

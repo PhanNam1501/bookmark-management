@@ -20,6 +20,7 @@ type Engine interface {
 	createUUID()
 	shortenURL()
 	linkShortenURL()
+	redirectURL()
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
@@ -39,6 +40,7 @@ func New(cfg *Config, redisClient *redis.Client) Engine {
 	a.createUUID()
 	a.shortenURL()
 	a.linkShortenURL()
+	a.redirectURL()
 	a.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return a
 }
@@ -80,4 +82,12 @@ func (a *api) linkShortenURL() {
 	shortenURLHandler := handler.NewLinkShortenHandler(shortenURLSvc)
 
 	a.app.POST("/v1/links/shorten", shortenURLHandler.LinkShortenURL)
+}
+
+func (a *api) redirectURL() {
+	urlStorage := repository.NewURLStorage(a.redisClient)
+	urlRedirectSvc := service.NewUrlRedirect(urlStorage)
+	urlRedirectHandler := handler.NewRedirectURLHandler(urlRedirectSvc)
+
+	a.app.GET("/v1/links/redirect/:code", urlRedirectHandler.RedirectURL)
 }

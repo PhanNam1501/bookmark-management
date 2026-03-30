@@ -17,6 +17,7 @@ type URLStorage interface {
 	CheckRedisConnection(ctx context.Context) error
 	StoreURL(ctx context.Context, code, url string) (string, error)
 	LinkShortenURL(ctx context.Context, code, url string, exp int) (string, error)
+	GetRedirectURL(ctx context.Context, code string) (string, error)
 }
 
 type urlStorage struct {
@@ -63,4 +64,12 @@ func (s *urlStorage) LinkShortenURL(ctx context.Context, code, url string, exp i
 		return "", err
 	}
 	return res, nil
+}
+
+func (s *urlStorage) GetRedirectURL(ctx context.Context, code string) (string, error) {
+	url, err := s.redisClient.Get(ctx, code).Result()
+	if err != nil {
+		return "", err
+	}
+	return url, nil
 }

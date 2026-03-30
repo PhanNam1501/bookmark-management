@@ -31,6 +31,34 @@ func (_m *URLStorage) CheckRedisConnection(ctx context.Context) error {
 	return r0
 }
 
+// GetRedirectURL provides a mock function with given fields: ctx, code
+func (_m *URLStorage) GetRedirectURL(ctx context.Context, code string) (string, error) {
+	ret := _m.Called(ctx, code)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetRedirectURL")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+		return rf(ctx, code)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(ctx, code)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, code)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // LinkShortenURL provides a mock function with given fields: ctx, code, url, exp
 func (_m *URLStorage) LinkShortenURL(ctx context.Context, code string, url string, exp int) (string, error) {
 	ret := _m.Called(ctx, code, url, exp)

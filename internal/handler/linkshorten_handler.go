@@ -23,7 +23,7 @@ func NewLinkShortenHandler(svc service.ShortenURL) LinkShortURL {
 
 type linkShortenURLRequest struct {
 	ExpTime int    `json:"exp"`
-	URL     string `json:"url"`
+	URL     string `json:"url" binding:"required,url"`
 }
 
 type LinkShortenURLResponse struct {
