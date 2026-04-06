@@ -25,20 +25,14 @@ type redirectURLRequest struct {
 	Code string `uri:"code" binding:"required"`
 }
 
-type RedirectURLResponse struct {
-	URL string `json:"url"`
-}
-
 // RedirectURL redirects the short code to its original long URL.
-// @Summary      Get Original URL
-// @Description  Retrieve the original long URL associated with the provided short code from the path.
+// @Summary      Redirect to Original URL
+// @Description  Retrieves the original long URL and performs a 301 redirect.
 // @Tags         Redirect
-// @Accept       json
-// @Produce      json
-// @Param        code   path      string  true  "The unique short code (e.g., abc123X)"
-// @Success      200    {object}  RedirectURLResponse "Successfully retrieved the URL"
-// @Failure      400    {object}  map[string]string   "Invalid or missing code in path"
-// @Failure      500    {object}  map[string]string   "Internal server error"
+// @Param        code   path      string  true  "The unique short code"
+// @Success      301    {string}  string  "Redirecting to the original URL"
+// @Failure      400    {object}  map[string]string  "Invalid or missing code"
+// @Failure      404    {object}  map[string]string  "Short code not found"
 // @Router       /v1/links/redirect/{code} [get]
 func (r *redirectURLHandler) RedirectURL(c *gin.Context) {
 	input := &redirectURLRequest{}
@@ -53,7 +47,5 @@ func (r *redirectURLHandler) RedirectURL(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, RedirectURLResponse{
-		URL: url,
-	})
+	c.Redirect(http.StatusMovedPermanently, url)
 }

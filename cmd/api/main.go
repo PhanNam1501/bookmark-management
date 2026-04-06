@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/PhanNam1501/bookmark-management/internal/api"
+	"github.com/PhanNam1501/bookmark-management/pkg/logger"
 	redisPkg "github.com/PhanNam1501/bookmark-management/pkg/redis"
 )
 
@@ -11,6 +12,8 @@ import (
 // @host			localhost:8080
 // @BasePath		/
 func main() {
+	logger.SetLogLevel()
+
 	cfg, err := api.NewConfig("")
 	if err != nil {
 		panic(err)

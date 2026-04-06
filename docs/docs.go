@@ -104,35 +104,29 @@ const docTemplate = `{
         },
         "/v1/links/redirect/{code}": {
             "get": {
-                "description": "Retrieve the original long URL associated with the provided short code from the path.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Retrieves the original long URL and performs a 301 redirect.",
                 "tags": [
                     "Redirect"
                 ],
-                "summary": "Get Original URL",
+                "summary": "Redirect to Original URL",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "The unique short code (e.g., abc123X)",
+                        "description": "The unique short code",
                         "name": "code",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Successfully retrieved the URL",
+                    "301": {
+                        "description": "Redirecting to the original URL",
                         "schema": {
-                            "$ref": "#/definitions/handler.RedirectURLResponse"
+                            "type": "string"
                         }
                     },
                     "400": {
-                        "description": "Invalid or missing code in path",
+                        "description": "Invalid or missing code",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -140,8 +134,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal server error",
+                    "404": {
+                        "description": "Short code not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -200,14 +194,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "service_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.RedirectURLResponse": {
-            "type": "object",
-            "properties": {
-                "url": {
                     "type": "string"
                 }
             }

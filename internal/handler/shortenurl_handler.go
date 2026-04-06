@@ -5,6 +5,7 @@ import (
 
 	"github.com/PhanNam1501/bookmark-management/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 type ShortenURL interface {
@@ -45,6 +46,7 @@ func (s *shortenURLHandler) ShortenURL(c *gin.Context) {
 
 	key, err := s.svc.ShortenURL(c, input.URL)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to shorten URL")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server err"})
 		return
 	}

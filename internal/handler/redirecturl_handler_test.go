@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +21,6 @@ func TestRedirectURLHandler(t *testing.T) {
 		setupMockSvc func() *mocks.URLRedirect
 
 		expectedStatus int
-		expectedResp   RedirectURLResponse
 	}{
 		{
 			name: "success",
@@ -49,9 +47,6 @@ func TestRedirectURLHandler(t *testing.T) {
 			},
 
 			expectedStatus: http.StatusOK,
-			expectedResp: RedirectURLResponse{
-				URL: "http://google.com",
-			},
 		},
 	}
 
@@ -64,9 +59,6 @@ func TestRedirectURLHandler(t *testing.T) {
 
 			testHandler.RedirectURL(gc)
 			assert.Equal(t, tc.expectedStatus, rec.Code)
-			var resp RedirectURLResponse
-			json.Unmarshal(rec.Body.Bytes(), &resp)
-			assert.Equal(t, tc.expectedResp, resp)
 		})
 	}
 }
