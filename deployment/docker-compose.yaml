@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - bookmark_management
+
+  bookmark_service:
+    image: bookmark_service:dev
+    container_name: bookmark_service
+    env_file:
+      - ./bookmark_service/.env
+    networks:
+      - bookmark_management
+
+  bookmark_service2:
+    image: bookmark_service:dev
+    container_name: bookmark_service2
+    env_file:
+      - ./bookmark_service/.env
+    networks:
+      - bookmark_management
+
+  bookmark_service3:
+    image: bookmark_service:dev
+    container_name: bookmark_service3
+    env_file:
+      - ./bookmark_service/.env
+    networks:
+      - bookmark_management
+
+  portal:
+    image: ebnv/bookmark-app-portal:dev
+    container_name: portal
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    networks:
+      - bookmark_management   
+
+networks:
+  bookmark_management:
+    driver: bridge
