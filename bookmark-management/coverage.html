@@ -67,33 +67,41 @@
 				
 				<option value="file5">github.com/PhanNam1501/bookmark-management/internal/handler/bookmark_handler.go (75.0%)</option>
 				
-				<option value="file6">github.com/PhanNam1501/bookmark-management/internal/handler/linkshorten_handlers.go (0.0%)</option>
+				<option value="file6">github.com/PhanNam1501/bookmark-management/internal/handler/linkshorten_handler.go (60.0%)</option>
 				
 				<option value="file7">github.com/PhanNam1501/bookmark-management/internal/handler/pass_handler.go (100.0%)</option>
 				
-				<option value="file8">github.com/PhanNam1501/bookmark-management/internal/handler/shortenurl_handler.go (60.0%)</option>
+				<option value="file8">github.com/PhanNam1501/bookmark-management/internal/handler/redirecturl_handler.go (60.0%)</option>
 				
-				<option value="file9">github.com/PhanNam1501/bookmark-management/internal/repository/mocks/urlstorage.go (0.0%)</option>
+				<option value="file9">github.com/PhanNam1501/bookmark-management/internal/handler/shortenurl_handler.go (54.5%)</option>
 				
-				<option value="file10">github.com/PhanNam1501/bookmark-management/internal/repository/urlstorage.go (26.7%)</option>
+				<option value="file10">github.com/PhanNam1501/bookmark-management/internal/repository/mocks/urlstorage.go (0.0%)</option>
 				
-				<option value="file11">github.com/PhanNam1501/bookmark-management/internal/service/bookmark_service.go (33.3%)</option>
+				<option value="file11">github.com/PhanNam1501/bookmark-management/internal/repository/urlstorage.go (21.1%)</option>
 				
-				<option value="file12">github.com/PhanNam1501/bookmark-management/internal/service/mocks/bookmark_service.go (0.0%)</option>
+				<option value="file12">github.com/PhanNam1501/bookmark-management/internal/service/bookmark_service.go (33.3%)</option>
 				
-				<option value="file13">github.com/PhanNam1501/bookmark-management/internal/service/mocks/pass_service.go (0.0%)</option>
+				<option value="file13">github.com/PhanNam1501/bookmark-management/internal/service/mocks/bookmark_service.go (0.0%)</option>
 				
-				<option value="file14">github.com/PhanNam1501/bookmark-management/internal/service/mocks/shortenurl_service.go (0.0%)</option>
+				<option value="file14">github.com/PhanNam1501/bookmark-management/internal/service/mocks/pass_service.go (0.0%)</option>
 				
-				<option value="file15">github.com/PhanNam1501/bookmark-management/internal/service/pass_service.go (87.5%)</option>
+				<option value="file15">github.com/PhanNam1501/bookmark-management/internal/service/mocks/shortenurl_service.go (0.0%)</option>
 				
-				<option value="file16">github.com/PhanNam1501/bookmark-management/internal/service/shortenurl_service.go (71.4%)</option>
+				<option value="file16">github.com/PhanNam1501/bookmark-management/internal/service/mocks/urlredirect_service.go (0.0%)</option>
 				
-				<option value="file17">github.com/PhanNam1501/bookmark-management/pkg/redis/client.go (0.0%)</option>
+				<option value="file17">github.com/PhanNam1501/bookmark-management/internal/service/pass_service.go (87.5%)</option>
 				
-				<option value="file18">github.com/PhanNam1501/bookmark-management/pkg/redis/config.go (0.0%)</option>
+				<option value="file18">github.com/PhanNam1501/bookmark-management/internal/service/shortenurl_service.go (71.4%)</option>
 				
-				<option value="file19">github.com/PhanNam1501/bookmark-management/pkg/redis/mock.go (0.0%)</option>
+				<option value="file19">github.com/PhanNam1501/bookmark-management/internal/service/urlredirect_service.go (100.0%)</option>
+				
+				<option value="file20">github.com/PhanNam1501/bookmark-management/pkg/logger/level.go (0.0%)</option>
+				
+				<option value="file21">github.com/PhanNam1501/bookmark-management/pkg/redis/client.go (0.0%)</option>
+				
+				<option value="file22">github.com/PhanNam1501/bookmark-management/pkg/redis/config.go (0.0%)</option>
+				
+				<option value="file23">github.com/PhanNam1501/bookmark-management/pkg/redis/mock.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -111,6 +119,7 @@
 
 import (
         "github.com/PhanNam1501/bookmark-management/internal/api"
+        "github.com/PhanNam1501/bookmark-management/pkg/logger"
         redisPkg "github.com/PhanNam1501/bookmark-management/pkg/redis"
 )
 
@@ -120,6 +129,8 @@ import (
 // @host                        localhost:8080
 // @BasePath                /
 func main() <span class="cov0" title="0">{
+        logger.SetLogLevel()
+
         cfg, err := api.NewConfig("")
         if err != nil </span><span class="cov0" title="0">{
                 panic(err)</span>
@@ -256,6 +267,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/links/redirect/{code}": {
+            "get": {
+                "description": "Retrieves the original long URL and performs a 301 redirect.",
+                "tags": [
+                    "Redirect"
+                ],
+                "summary": "Redirect to Original URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The unique short code",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "301": {
+                        "description": "Redirecting to the original URL",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing code",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Short code not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/links/shorten": {
             "post": {
                 "consumes": [
@@ -310,6 +365,9 @@ const docTemplate = `{
         },
         "handler.linkShortenURLRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "exp": {
                     "type": "integer"
@@ -321,6 +379,9 @@ const docTemplate = `{
         },
         "handler.shortenURLRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "url": {
                     "type": "string"
@@ -355,7 +416,7 @@ import (
         "fmt"
         "net/http"
 
-        _ "github.com/PhanNam1501/bookmark-management/docs"
+        "github.com/PhanNam1501/bookmark-management/docs"
         "github.com/PhanNam1501/bookmark-management/internal/handler"
         "github.com/PhanNam1501/bookmark-management/internal/repository"
         "github.com/PhanNam1501/bookmark-management/internal/service"
@@ -371,6 +432,7 @@ type Engine interface {
         createUUID()
         shortenURL()
         linkShortenURL()
+        redirectURL()
         ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
@@ -390,6 +452,9 @@ func New(cfg *Config, redisClient *redis.Client) Engine <span class="cov0" title
         a.createUUID()
         a.shortenURL()
         a.linkShortenURL()
+        a.redirectURL()
+
+        docs.SwaggerInfo.Host = a.cfg.Hostname
         a.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
         return a
 }</span>
@@ -432,6 +497,14 @@ func (a *api) linkShortenURL() <span class="cov0" title="0">{
 
         a.app.POST("/v1/links/shorten", shortenURLHandler.LinkShortenURL)
 }</span>
+
+func (a *api) redirectURL() <span class="cov0" title="0">{
+        urlStorage := repository.NewURLStorage(a.redisClient)
+        urlRedirectSvc := service.NewUrlRedirect(urlStorage)
+        urlRedirectHandler := handler.NewRedirectURLHandler(urlRedirectSvc)
+
+        a.app.GET("/v1/links/redirect/:code", urlRedirectHandler.RedirectURL)
+}</span>
 </pre>
 		
 		<pre class="file" id="file4" style="display: none">package api
@@ -439,7 +512,8 @@ func (a *api) linkShortenURL() <span class="cov0" title="0">{
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-        AppPort string `default:"8080" envconfig:"APP_PORT"`
+        AppPort  string `default:"8080" envconfig:"APP_PORT"`
+        Hostname string `default:"localhost:8080" envconfig:"APP_HOSTNAME"`
 }
 
 func NewConfig(envPrefix string) (*Config, error) <span class="cov0" title="0">{
@@ -526,7 +600,7 @@ type linkshortURLHandler struct {
         svc service.ShortenURL
 }
 
-func NewLinkShortenHandler(svc service.ShortenURL) LinkShortURL <span class="cov0" title="0">{
+func NewLinkShortenHandler(svc service.ShortenURL) LinkShortURL <span class="cov8" title="1">{
         return &amp;linkshortURLHandler{
                 svc: svc,
         }
@@ -534,7 +608,12 @@ func NewLinkShortenHandler(svc service.ShortenURL) LinkShortURL <span class="cov
 
 type linkShortenURLRequest struct {
         ExpTime int    `json:"exp"`
-        URL     string `json:"url"`
+        URL     string `json:"url" binding:"required,url"`
+}
+
+type LinkShortenURLResponse struct {
+        Code    string `json:"code"`
+        Message string `json:"message"`
 }
 
 // @Summary Link Shorten URL
@@ -544,20 +623,23 @@ type linkShortenURLRequest struct {
 // @Param request body linkShortenURLRequest true "Request body"
 // @Success 200 {object} map[string]string
 // @Router /v1/links/shorten [post]
-func (s *linkshortURLHandler) LinkShortenURL(c *gin.Context) <span class="cov0" title="0">{
+func (s *linkshortURLHandler) LinkShortenURL(c *gin.Context) <span class="cov8" title="1">{
         input := &amp;linkShortenURLRequest{}
         if err := c.ShouldBindJSON(input); err != nil </span><span class="cov0" title="0">{
                 c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
                 return
         }</span>
 
-        <span class="cov0" title="0">key, err := s.svc.LinkShortenURL(c, input.URL, input.ExpTime)
+        <span class="cov8" title="1">key, err := s.svc.LinkShortenURL(c, input.URL, input.ExpTime)
         if err != nil </span><span class="cov0" title="0">{
                 c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server err"})
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{"code": key, "message": "Shorten URL generated successfully!"})</span>
+        <span class="cov8" title="1">c.JSON(http.StatusOK, LinkShortenURLResponse{
+                Code:    key,
+                Message: "Shorten URL generated successfully!",
+        })</span>
 }
 </pre>
 		
@@ -607,6 +689,60 @@ import (
         "github.com/gin-gonic/gin"
 )
 
+type RedirectURL interface {
+        RedirectURL(c *gin.Context)
+}
+
+type redirectURLHandler struct {
+        svc service.URLRedirect
+}
+
+func NewRedirectURLHandler(svc service.URLRedirect) RedirectURL <span class="cov8" title="1">{
+        return &amp;redirectURLHandler{
+                svc: svc,
+        }
+}</span>
+
+type redirectURLRequest struct {
+        Code string `uri:"code" binding:"required"`
+}
+
+// RedirectURL redirects the short code to its original long URL.
+// @Summary      Redirect to Original URL
+// @Description  Retrieves the original long URL and performs a 301 redirect.
+// @Tags         Redirect
+// @Param        code   path      string  true  "The unique short code"
+// @Success      301    {string}  string  "Redirecting to the original URL"
+// @Failure      400    {object}  map[string]string  "Invalid or missing code"
+// @Failure      404    {object}  map[string]string  "Short code not found"
+// @Router       /v1/links/redirect/{code} [get]
+func (r *redirectURLHandler) RedirectURL(c *gin.Context) <span class="cov8" title="1">{
+        input := &amp;redirectURLRequest{}
+        if err := c.ShouldBindUri(input); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov8" title="1">url, err := r.svc.GetRedirectURL(c, input.Code)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server err"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.Redirect(http.StatusMovedPermanently, url)</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/PhanNam1501/bookmark-management/internal/service"
+        "github.com/gin-gonic/gin"
+        "github.com/rs/zerolog/log"
+)
+
 type ShortenURL interface {
         ShortenURL(c *gin.Context)
 }
@@ -622,7 +758,7 @@ func NewShortenURLHandler(svc service.ShortenURL) ShortenURL <span class="cov8" 
 }</span>
 
 type shortenURLRequest struct {
-        URL string `json:"url"`
+        URL string `json:"url" binding:"required,url"`
 }
 
 type ShortenURLResponse struct {
@@ -645,6 +781,7 @@ func (s *shortenURLHandler) ShortenURL(c *gin.Context) <span class="cov8" title=
 
         <span class="cov8" title="1">key, err := s.svc.ShortenURL(c, input.URL)
         if err != nil </span><span class="cov0" title="0">{
+                log.Error().Err(err).Msg("Failed to shorten URL")
                 c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server err"})
                 return
         }</span>
@@ -655,7 +792,7 @@ func (s *shortenURLHandler) ShortenURL(c *gin.Context) <span class="cov8" title=
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
+		<pre class="file" id="file10" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
 
 package mocks
 
@@ -686,6 +823,34 @@ func (_m *URLStorage) CheckRedisConnection(ctx context.Context) error <span clas
         }</span>
 
         <span class="cov0" title="0">return r0</span>
+}
+
+// GetRedirectURL provides a mock function with given fields: ctx, code
+func (_m *URLStorage) GetRedirectURL(ctx context.Context, code string) (string, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, code)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for GetRedirectURL")</span>
+        }
+
+        <span class="cov0" title="0">var r0 string
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, code)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string) string); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, code)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(string)
+        }</span>
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, code)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
 }
 
 // LinkShortenURL provides a mock function with given fields: ctx, code, url, exp
@@ -759,7 +924,7 @@ func NewURLStorage(t interface {
 }
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package repository
+		<pre class="file" id="file11" style="display: none">package repository
 
 import (
         "context"
@@ -778,6 +943,7 @@ type URLStorage interface {
         CheckRedisConnection(ctx context.Context) error
         StoreURL(ctx context.Context, code, url string) (string, error)
         LinkShortenURL(ctx context.Context, code, url string, exp int) (string, error)
+        GetRedirectURL(ctx context.Context, code string) (string, error)
 }
 
 type urlStorage struct {
@@ -825,9 +991,17 @@ func (s *urlStorage) LinkShortenURL(ctx context.Context, code, url string, exp i
         }</span>
         <span class="cov0" title="0">return res, nil</span>
 }
+
+func (s *urlStorage) GetRedirectURL(ctx context.Context, code string) (string, error) <span class="cov0" title="0">{
+        url, err := s.redisClient.Get(ctx, code).Result()
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">return url, nil</span>
+}
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package service
+		<pre class="file" id="file12" style="display: none">package service
 
 import (
         "context"
@@ -867,7 +1041,7 @@ func (b *bookmarkService) CheckRedisConnection(ctx context.Context) error <span 
 }
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
+		<pre class="file" id="file13" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
 
 package mocks
 
@@ -933,7 +1107,7 @@ func NewBookmark(t interface {
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
+		<pre class="file" id="file14" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
 
 package mocks
 
@@ -987,7 +1161,7 @@ func NewPassword(t interface {
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
+		<pre class="file" id="file15" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
 
 package mocks
 
@@ -1073,7 +1247,65 @@ func NewShortenURL(t interface {
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package service
+		<pre class="file" id="file16" style="display: none">// Code generated by mockery v2.53.6. DO NOT EDIT.
+
+package mocks
+
+import (
+        context "context"
+
+        mock "github.com/stretchr/testify/mock"
+)
+
+// URLRedirect is an autogenerated mock type for the URLRedirect type
+type URLRedirect struct {
+        mock.Mock
+}
+
+// GetRedirectURL provides a mock function with given fields: ctx, code
+func (_m *URLRedirect) GetRedirectURL(ctx context.Context, code string) (string, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, code)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for GetRedirectURL")</span>
+        }
+
+        <span class="cov0" title="0">var r0 string
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, code)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string) string); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, code)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(string)
+        }</span>
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, code)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// NewURLRedirect creates a new instance of URLRedirect. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+// The first argument is typically a *testing.T value.
+func NewURLRedirect(t interface {
+        mock.TestingT
+        Cleanup(func())
+}) *URLRedirect <span class="cov0" title="0">{
+        mock := &amp;URLRedirect{}
+        mock.Mock.Test(t)
+
+        t.Cleanup(func() </span><span class="cov0" title="0">{ mock.AssertExpectations(t) }</span>)
+
+        <span class="cov0" title="0">return mock</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package service
 
 import (
         "bytes"
@@ -1118,7 +1350,7 @@ func (s *passwordService) GeneratePassword() (string, error) <span class="cov8" 
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package service
+		<pre class="file" id="file18" style="display: none">package service
 
 import (
         "context"
@@ -1187,7 +1419,56 @@ func (s *shortenURLService) LinkShortenURL(ctx context.Context, url string, exp 
 }
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package redis
+		<pre class="file" id="file19" style="display: none">package service
+
+import (
+        "context"
+
+        "github.com/PhanNam1501/bookmark-management/internal/repository"
+)
+
+//go:generate mockery --name URLRedirect --filename urlredirect_service.go
+type URLRedirect interface {
+        GetRedirectURL(ctx context.Context, code string) (string, error)
+}
+
+type urlRedirectService struct {
+        urlStorage repository.URLStorage
+}
+
+func NewUrlRedirect(urlStorage repository.URLStorage) URLRedirect <span class="cov8" title="1">{
+        return &amp;urlRedirectService{
+                urlStorage: urlStorage,
+        }
+}</span>
+
+func (u *urlRedirectService) GetRedirectURL(ctx context.Context, code string) (string, error) <span class="cov8" title="1">{
+        val, err := u.urlStorage.GetRedirectURL(ctx, code)
+        return val, err
+}</span>
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package logger
+
+import (
+        "os"
+
+        "github.com/rs/zerolog"
+)
+
+const EnvLogLevel = "LOG_LEVEL"
+
+func SetLogLevel() <span class="cov0" title="0">{
+        level, err := zerolog.ParseLevel(os.Getenv("LOG_LEVEL"))
+        if err != nil || level == zerolog.NoLevel </span><span class="cov0" title="0">{
+                level = zerolog.InfoLevel
+        }</span>
+
+        <span class="cov0" title="0">zerolog.SetGlobalLevel(level)</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package redis
 
 import "github.com/redis/go-redis/v9"
 
@@ -1205,7 +1486,7 @@ func NewClient(envPrefix string) (*redis.Client, error) <span class="cov0" title
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package redis
+		<pre class="file" id="file22" style="display: none">package redis
 
 import "github.com/kelseyhightower/envconfig"
 
@@ -1226,7 +1507,7 @@ func NewConfig(envPrefix string) (*config, error) <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file19" style="display: none">package redis
+		<pre class="file" id="file23" style="display: none">package redis
 
 import (
         "testing"
