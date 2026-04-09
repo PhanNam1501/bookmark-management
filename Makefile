@@ -1,7 +1,7 @@
 # ==========================================
 # CẤU HÌNH CƠ BẢN
 # ==========================================
-APP_NAME         := bookmark_service
+APP_NAME := phannam1501/bookmark_service
 MAIN_PATH        := cmd/api/main.go
 COVERAGE_EXCLUDE := "mocks|main.go|docs|test"
 COVERAGE_DIR     := coverage
