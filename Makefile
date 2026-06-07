@@ -67,6 +67,9 @@ docker-release:
 	@echo "==> Đẩy image $(APP_NAME):$(IMAGE_TAG) lên registry..."
 	docker push $(APP_NAME):$(IMAGE_TAG)
 
+generate-rsa-key:
+	openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
+	openssl rsa -pubout -in private.pem -out public.pem
 # ==========================================
 # DỌN DẸP
 # ==========================================

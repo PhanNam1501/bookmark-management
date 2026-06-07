@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/PhanNam1501/bookmark-management/internal/api"
+	"github.com/PhanNam1501/bookmark-management/internal/test/fixture"
 	redisPkg "github.com/PhanNam1501/bookmark-management/pkg/redis"
 	"github.com/go-openapi/testify/v2/assert"
 	"github.com/redis/go-redis/v9"
@@ -56,7 +57,12 @@ func TestURLRedirectEndpoint(t *testing.T) {
 			}
 			redisClient := redisPkg.InitMockRedis(t)
 			tc.seedData(redisClient)
-			app := api.New(cfg, redisClient)
+			db := fixture.NewFixture(t, &fixture.UserCommonTestDB{})
+			app := api.New(api.EngineOpts{
+				Config:      cfg,
+				RedisClient: redisClient,
+				DB:          db,
+			})
 			rec := tc.setupTestHttp(app)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)

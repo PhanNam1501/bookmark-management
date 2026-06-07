@@ -23,12 +23,12 @@ func TestRedirectURLHandler(t *testing.T) {
 		expectedStatus int
 	}{
 		{
-			name: "success",
+			name: "success - Redis code (length 7)",
 			setupRequest: func() (*gin.Context, *httptest.ResponseRecorder) {
 				rec := httptest.NewRecorder()
 				gc, _ := gin.CreateTestContext(rec)
 
-				testCode := "ScC6OyVRVA"
+				testCode := "AbC6OyV"
 				gc.Params = []gin.Param{{Key: "code", Value: testCode}}
 				req := httptest.NewRequest(http.MethodGet, "/v1/links/redirect/"+testCode, nil)
 				req.Header.Set("Content-Type", "application/json")
@@ -41,8 +41,34 @@ func TestRedirectURLHandler(t *testing.T) {
 				svcMock.On(
 					"GetRedirectURL",
 					mock.Anything,
-					"ScC6OyVRVA",
+					"AbC6OyV",
 				).Return("http://google.com", nil)
+				return svcMock
+			},
+
+			expectedStatus: http.StatusMovedPermanently,
+		},
+		{
+			name: "success - Database bookmark (length 8)",
+			setupRequest: func() (*gin.Context, *httptest.ResponseRecorder) {
+				rec := httptest.NewRecorder()
+				gc, _ := gin.CreateTestContext(rec)
+
+				testCode := "AbC6OyVR"
+				gc.Params = []gin.Param{{Key: "code", Value: testCode}}
+				req := httptest.NewRequest(http.MethodGet, "/v1/links/redirect/"+testCode, nil)
+				req.Header.Set("Content-Type", "application/json")
+
+				gc.Request = req
+				return gc, rec
+			},
+			setupMockSvc: func() *mocks.URLRedirect {
+				svcMock := mocks.NewURLRedirect(t)
+				svcMock.On(
+					"GetRedirectURL",
+					mock.Anything,
+					"AbC6OyVR",
+				).Return("https://github.com", nil)
 				return svcMock
 			},
 

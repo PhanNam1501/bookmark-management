@@ -62,6 +62,9 @@ WORKDIR /app
 
 COPY --from=build /opt/app/bookmark_service /app/bookmark_service
 COPY --from=build /opt/app/docs /app/docs
+COPY --from=build /opt/app/migrations /app/migrations
+COPY --from=build /opt/app/public.pem /app/
+COPY --from=build /opt/app/private.pem /app/
 
 # Nên khai báo Port để người xem Dockerfile biết app chạy ở cổng nào (VD: 8080)
 EXPOSE 8080

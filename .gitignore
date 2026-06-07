@@ -1,0 +1,39 @@
+# Database data
+db_data/
+deployment/db_data/
+
+# Binary files
+*.exe
+*.dll
+*.so
+*.dylib
+app.exe
+
+# Sensitive files
+*.pem
+private.pem
+public.pem
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Go
+*.mod.sum
+vendor/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/

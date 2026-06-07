@@ -1,5 +1,78 @@
 basePath: /
 definitions:
+  bookmark.CreateBookmarkResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.Bookmark'
+      message:
+        type: string
+    type: object
+  bookmark.DeleteResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  bookmark.GetBookmarksResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.Bookmark'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/dto.Pagination'
+    type: object
+  bookmark.UpdateResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  bookmark.addBookmarkInput:
+    properties:
+      description:
+        example: Google
+        maxLength: 255
+        type: string
+      url:
+        example: https://www.google.com
+        maxLength: 2048
+        type: string
+    required:
+    - url
+    type: object
+  bookmark.updateBookmarkInput:
+    properties:
+      description:
+        maxLength: 255
+        type: string
+      url:
+        maxLength: 2048
+        type: string
+    required:
+    - url
+    type: object
+  dto.ErrorResponse:
+    properties:
+      code:
+        type: string
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.Pagination:
+    properties:
+      limit:
+        example: 10
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 100
+        type: integer
+    type: object
   handler.BaseResponse:
     properties:
       instance_id:
@@ -7,6 +80,18 @@ definitions:
       message:
         type: string
       service_name:
+        type: string
+    type: object
+  handler.LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/handler.LoginTokenResponse'
+      message:
+        type: string
+    type: object
+  handler.LoginTokenResponse:
+    properties:
+      token:
         type: string
     type: object
   handler.linkShortenURLRequest:
@@ -18,12 +103,68 @@ definitions:
     required:
     - url
     type: object
+  handler.loginInput:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.redisterInputBody:
+    properties:
+      display_name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   handler.shortenURLRequest:
     properties:
       url:
         type: string
     required:
     - url
+    type: object
+  model.Bookmark:
+    properties:
+      code:
+        type: string
+      code_int:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.User:
+    properties:
+      created_at:
+        type: string
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
     type: object
 host: localhost:8080
 info:
@@ -89,6 +230,242 @@ paths:
       summary: Shorten URL
       tags:
       - ShortenURL
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with username and password, return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.loginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.LoginResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Invalid username or password
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: User login
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with username, password, display name,
+        and email
+      parameters:
+      - description: User registration data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.redisterInputBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - users
+  /v1/bookmarks:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of bookmarks for the authenticated user
+      parameters:
+      - default: 1
+        description: Page number (starting from 1)
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of bookmarks
+          schema:
+            $ref: '#/definitions/bookmark.GetBookmarksResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get user bookmarks
+      tags:
+      - Bookmarks
+    post:
+      consumes:
+      - application/json
+      description: Create a new bookmark for the authenticated user
+      parameters:
+      - description: Bookmark request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/bookmark.addBookmarkInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/bookmark.CreateBookmarkResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new bookmark
+      tags:
+      - Bookmarks
+  /v1/bookmarks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a bookmark by ID (must be owned by current user)
+      parameters:
+      - description: Bookmark ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/bookmark.DeleteResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete bookmark
+      tags:
+      - Bookmarks
+    put:
+      consumes:
+      - application/json
+      description: Update an existing bookmark (URL and description)
+      parameters:
+      - description: Bookmark ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/bookmark.updateBookmarkInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/bookmark.UpdateResponse'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update bookmark
+      tags:
+      - Bookmarks
   /v1/links/redirect/{code}:
     get:
       description: Retrieves the original long URL and performs a 301 redirect.
@@ -141,4 +518,37 @@ paths:
       summary: Link Shorten URL
       tags:
       - LinkShortenURL
+  /v1/self/info:
+    get:
+      description: Get the authenticated user's information from JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized or invalid token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get current user information
+      tags:
+      - users
+securityDefinitions:
+  Bearer:
+    description: JWT token with Bearer prefix
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -16,6 +16,23 @@ services:
       - REDIS_ADDR=redis:6379
     networks:
       - bookmark_management
+    volumes:
+      - ./public.pem:/app/public.pem
+      - ./private.pem:/app/private.pem
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    ports: 
+    - "5432:5432"
+    # volumes:
+    # - ./db_data:/var/lib/postgresql 
+    environment:
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=bookmark_service
+    networks:
+      - bookmark_management
 
 networks:
   bookmark_management:

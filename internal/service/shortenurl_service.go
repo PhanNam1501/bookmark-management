@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/PhanNam1501/bookmark-management/internal/repository"
+	"github.com/PhanNam1501/bookmark-management/pkg/utils"
 )
 
 const (
@@ -54,6 +55,7 @@ func (s *shortenURLService) LinkShortenURL(ctx context.Context, url string, exp 
 		if err != nil {
 			return "", err
 		}
+		code = utils.MapGenerateCodeForRedis(code)
 		ok, err := s.urlStorage.LinkShortenURL(ctx, code, url, exp)
 		if err != nil {
 			return "", fmt.Errorf("StoreURL: %w", err)
