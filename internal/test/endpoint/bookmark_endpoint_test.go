@@ -52,11 +52,7 @@ func TestBookmarkEndpoint(t *testing.T) {
 				panic(err)
 			}
 
-			redisClient, err := redisPkg.NewClient("")
-			if err != nil {
-				panic(err)
-			}
-
+			redisClient := redisPkg.InitMockRedis(t)
 			db := fixture.NewFixture(t, &fixture.UserCommonTestDB{})
 
 			app := api.New(api.EngineOpts{

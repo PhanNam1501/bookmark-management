@@ -101,6 +101,7 @@ func TestRateLimit_RateLimit_GetRateLimitError(t *testing.T) {
 
 	assert.True(t, c.IsAborted(), "request should be aborted on GetRateLimit error")
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertCalled(t, "GetRateLimit", mock.Anything, testKey)
 	mockRepo.AssertNotCalled(t, "IncreaseRateLimit")
 }
 

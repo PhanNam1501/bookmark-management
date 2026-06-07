@@ -43,6 +43,8 @@ func (r *rateLimitMiddleware) RateLimit() gin.HandlerFunc {
 		curRateLimit, err := r.repo.GetRateLimit(c, rateLimitKey)
 		if err != nil {
 			log.Error().Err(err).Str("uid", uid).Str("key", rateLimitKey).Msg("get rate limit")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check rate limit"})
+			return
 		}
 
 		if curRateLimit >= rateLimitMaxRate {
@@ -52,6 +54,8 @@ func (r *rateLimitMiddleware) RateLimit() gin.HandlerFunc {
 
 		if err := r.repo.IncreaseRateLimit(c, rateLimitKey, rateLimitExpTime); err != nil {
 			log.Error().Err(err).Str("uid", uid).Str("key", rateLimitKey).Msg("increase rate limit")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update rate limit"})
+			return
 		}
 
 		// call next

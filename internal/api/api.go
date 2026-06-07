@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/PhanNam1501/bookmark-management/docs"
@@ -42,8 +43,45 @@ type api struct {
 	jwtValidator jwtutils.JWTValidator
 }
 
+// findPublicKey searches for public.pem starting from current directory up to root
+func findPublicKey() string {
+	candidates := []string{
+		filepath.FromSlash("./public.pem"),
+		filepath.FromSlash("../public.pem"),
+		filepath.FromSlash("../../public.pem"),
+		filepath.FromSlash("../../../public.pem"),
+	}
+
+	for _, path := range candidates {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	return filepath.FromSlash("./public.pem")
+}
+
+// findPrivateKey searches for private.pem starting from current directory up to root
+func findPrivateKey() string {
+	candidates := []string{
+		filepath.FromSlash("./private.pem"),
+		filepath.FromSlash("../private.pem"),
+		filepath.FromSlash("../../private.pem"),
+		filepath.FromSlash("../../../private.pem"),
+	}
+
+	for _, path := range candidates {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	return filepath.FromSlash("./private.pem")
+}
+
 func New(opts EngineOpts) Engine {
-	jwtValidator, err := jwtutils.NewJWTValidator(filepath.FromSlash("./public.pem"))
+	// Find public.pem by searching up the directory tree
+	publicKeyPath := findPublicKey()
+
+	jwtValidator, err := jwtutils.NewJWTValidator(publicKeyPath)
 	if err != nil {
 		panic("Failed to initialize JWT validator: " + err.Error())
 	}
@@ -153,7 +191,8 @@ func (a *api) getHandlers() *Handlers {
 
 	// User handler
 	userRepo := repository.NewUser(a.db)
-	jwtGen, err := jwtutils.NewJWTGenerator(filepath.FromSlash("./private.pem"))
+	privateKeyPath := findPrivateKey()
+	jwtGen, err := jwtutils.NewJWTGenerator(privateKeyPath)
 	if err != nil {
 		panic("Failed to initialize JWT generator: " + err.Error())
 	}

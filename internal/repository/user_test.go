@@ -91,10 +91,18 @@ func TestUser_CreateUser(t *testing.T) {
 
 			if tc.expectedErrStr == "" {
 				assert.Nil(t, err)
+				// Verify user data (ignore timestamps set by GORM)
+				assert.Equal(t, res.ID, tc.expectedOutput.ID)
+				assert.Equal(t, res.UserName, tc.expectedOutput.UserName)
+				assert.Equal(t, res.Password, tc.expectedOutput.Password)
+				assert.Equal(t, res.DisplayName, tc.expectedOutput.DisplayName)
+				assert.Equal(t, res.Email, tc.expectedOutput.Email)
+				// Verify timestamps are set by GORM
+				assert.NotEqual(t, res.CreatedAt.Year(), 1) // Not zero value
+				assert.NotEqual(t, res.UpdatedAt.Year(), 1) // Not zero value
 			} else {
 				assert.ErrorContains(t, err, tc.expectedErrStr)
 			}
-			assert.Equal(t, res, tc.expectedOutput)
 
 			if err == nil && tc.verifyFunc != nil {
 				tc.verifyFunc(db, tc.inputUser)

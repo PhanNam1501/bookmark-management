@@ -85,7 +85,7 @@ func TestLinkShortenURLService_ShortenURL(t *testing.T) {
 
 				return svcMock
 			},
-			expectedLen: 10,
+			expectedLen: 11, // 10 chars from password + 1 prefix from MapGenerateCodeForRedis
 			expectedErr: nil,
 		},
 	}

@@ -44,7 +44,7 @@ func TestLinkShortenURLEndpoint(t *testing.T) {
 			},
 
 			expectedStatus:  http.StatusOK,
-			expectedRespLen: 10,
+			expectedRespLen: 11, // 10 chars from password + 1 prefix from MapGenerateCodeForRedis
 		},
 	}
 
