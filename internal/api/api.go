@@ -12,9 +12,11 @@ import (
 	bookmarkhandler "github.com/PhanNam1501/bookmark-management/internal/handler/bookmark"
 	"github.com/PhanNam1501/bookmark-management/internal/repository"
 	"github.com/PhanNam1501/bookmark-management/internal/repository/cache"
+	"github.com/PhanNam1501/bookmark-management/internal/repository/queue"
 	"github.com/PhanNam1501/bookmark-management/internal/repository/ratelimit"
 	"github.com/PhanNam1501/bookmark-management/internal/service"
 	"github.com/PhanNam1501/bookmark-management/internal/service/bookmark"
+	queueService "github.com/PhanNam1501/bookmark-management/internal/service/queue"
 	"github.com/PhanNam1501/bookmark-management/pkg/jwtutils"
 	"github.com/PhanNam1501/bookmark-management/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -23,6 +25,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
+
+const queueBookmarkImportName = "bookmark_queue"
 
 type Engine interface {
 	Start() error
@@ -146,6 +150,7 @@ func (a *api) registerRoutes() {
 	privateRoutes.GET("/v1/bookmarks", handlers.BookmarkHandler.GetBookmarks)
 	privateRoutes.PUT("/v1/bookmarks/:id", handlers.BookmarkHandler.UpdateBookmark)
 	privateRoutes.DELETE("/v1/bookmarks/:id", handlers.BookmarkHandler.DeleteBookmark)
+	privateRoutes.POST("/v1/bookmarks/import", handlers.BookmarkHandler.Import)
 }
 
 type Handlers struct {
@@ -183,11 +188,15 @@ func (a *api) getHandlers() *Handlers {
 	urlRedirectSvc := service.NewUrlRedirectWithDB(urlStorage, bookmarkRepo)
 	redirectURLHandler := handler.NewRedirectURLHandler(urlRedirectSvc)
 
+	// redisqueue
+	redisQueue := queue.NewRedisQueue(a.redisClient, queueBookmarkImportName)
+	queueSvc := queueService.NewService(redisQueue)
+	// Cache
 	cacheRepo := cache.NewRedisRepo(a.redisClient)
 	keyGen := utils.NewRandomKeyGenerator(16)
 	bookmarkSvcDB := bookmark.NewService(bookmarkRepo, keyGen)
 	bookmarkSvcWithCache := bookmark.NewServiceWithCache(bookmarkSvcDB, cacheRepo)
-	bookmarkHandlerDB := bookmarkhandler.NewHandler(bookmarkSvcWithCache)
+	bookmarkHandlerDB := bookmarkhandler.NewHandler(bookmarkSvcWithCache, queueSvc)
 
 	// User handler
 	userRepo := repository.NewUser(a.db)

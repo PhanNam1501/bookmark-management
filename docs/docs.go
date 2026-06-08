@@ -338,6 +338,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/bookmarks/import": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Upload a CSV file to asynchronously import multiple bookmarks for the authenticated user. The import job is queued and processed in the background.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bookmarks"
+                ],
+                "summary": "Bulk import bookmarks from CSV file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with bookmark data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import job queued successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponseString"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid file or CSV parsing error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/bookmarks/{id}": {
             "put": {
                 "security": [
@@ -695,6 +759,20 @@ const docTemplate = `{
                 "total": {
                     "type": "integer",
                     "example": 100
+                }
+            }
+        },
+        "dto.SuccessResponseString": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/dto.Pagination"
                 }
             }
         },

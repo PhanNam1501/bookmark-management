@@ -73,6 +73,15 @@ definitions:
         example: 100
         type: integer
     type: object
+  dto.SuccessResponseString:
+    properties:
+      data:
+        type: string
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/dto.Pagination'
+    type: object
   handler.BaseResponse:
     properties:
       instance_id:
@@ -464,6 +473,48 @@ paths:
       security:
       - Bearer: []
       summary: Update bookmark
+      tags:
+      - Bookmarks
+  /v1/bookmarks/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a CSV file to asynchronously import multiple bookmarks for
+        the authenticated user. The import job is queued and processed in the background.
+      parameters:
+      - description: CSV file with bookmark data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import job queued successfully
+          schema:
+            $ref: '#/definitions/dto.SuccessResponseString'
+        "400":
+          description: Invalid file or CSV parsing error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Bulk import bookmarks from CSV file
       tags:
       - Bookmarks
   /v1/links/redirect/{code}:

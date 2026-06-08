@@ -54,3 +54,11 @@ func NewErrorResponseWithDetails(code, message, details string) *ErrorResponse {
 		Details: details,
 	}
 }
+
+// Concrete types for Swagger (swag doesn't support generics)
+// SuccessResponseString is a SuccessResponse with string data
+type SuccessResponseString struct {
+	Message    string       `json:"message,omitempty"`
+	Data       string       `json:"data,omitempty"`
+	Pagination *Pagination `json:"pagination,omitempty"`
+}
