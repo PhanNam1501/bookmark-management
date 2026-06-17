@@ -1,0 +1,212 @@
+📋 BOOKMARK MANAGEMENT API - INTERVIEW PREPARATION GUIDE
+=====================================================================
+
+Bạn đã có 3 file chuẩn bị hoàn chỉnh:
+
+1. 📄 INTERVIEW_SCRIPT.md (10,000+ words)
+   - Tổng quan chi tiết về dự án
+   - Giải thích kỹ về từng tech (Go, Gin, PostgreSQL, JWT, Redis, etc.)
+   - Kiến trúc Clean Architecture chi tiết
+   - Tất cả các tính năng chính
+   - Cách thuyết trình từng phần
+   - Câu trả lời cho các câu hỏi phỏng vấn thường gặp
+   - Những gì bạn học được
+   → Dùng để ĐỌC TRƯỚC KHI PHỎNG VẤN (tối thiểu 2-3 lần)
+
+2. ⚡ INTERVIEW_CHEATSHEET.md (Trang tắc lực)
+   - Elevator pitch 30 giây (nói mở đầu)
+   - Tech stack summary
+   - JWT flow (5 bước)
+   - Database schema (đơn giản)
+   - Key features (dễ nhớ)
+   - Q&A nhanh (câu trả lời 30 giây)
+   - Checklist trước phỏng vấn
+   - Time breakdown (phân bổ thời gian)
+   → Dùng để XEM NHANH TRƯỚC PHỎNG VẤN
+
+3. 📊 INTERVIEW_DIAGRAMS.md (12 biểu đồ chi tiết)
+   - Biểu đồ Clean Architecture
+   - JWT flow (diagram)
+   - Database schema diagram
+   - Request pipeline diagram
+   - Dependency injection pattern
+   - Password & JWT security
+   - Docker multi-stage build
+   - API response format
+   - Deployment architecture
+   - Testing pyramid
+   - Performance optimization
+   - SOLID principles
+   → Dùng để VẼ trên BỮA PHỎNG VẤN (khi được hỏi)
+
+=====================================================================
+📅 CÓ THỂ THEO LỘ TRÌNH NÀY:
+
+TUẦN TRƯỚC PHỎNG VẤN:
+□ Đọc INTERVIEW_SCRIPT.md từ đầu đến cuối (1-2 lần)
+□ Hiểu rõ từng section
+□ Chuẩn bị câu trả lời cho 10 câu Q&A chính
+□ Vẽ các diagrams (trên giấy hoặc bảng)
+
+NGÀY TRƯỚC PHỎNG VẤN:
+□ Đọc lại INTERVIEW_CHEATSHEET.md
+□ Ghi nhớ elevator pitch 30 giây
+□ Xem lại các diagrams
+□ Sleep well! 😴
+
+NGÀY PHỎNG VẤN:
+□ Xem nhanh INTERVIEW_CHEATSHEET.md 30 phút trước
+□ Nhớ elevator pitch
+□ Chuẩn bị vẽ diagrams
+□ Tự tin thuyết trình!
+
+=====================================================================
+🗣️ CẤU TRÚC THUYẾT TRÌNH TỐI ƯUAT (8-10 phút):
+
+1. MỞ ĐẦU (30 giây):
+   "Tôi xây dựng một Bookmark Management REST API..."
+   → Sử dụng elevator pitch từ CHEATSHEET
+
+2. KIẾN TRÚC (1-1.5 phút):
+   - Giải thích 4 layers
+   - Vẽ diagram Clean Architecture
+   - Tại sao lại chọn kiến trúc này
+
+3. TECH STACK (1 phút):
+   - Go + Gin (backend framework)
+   - PostgreSQL + GORM (database)
+   - JWT + RS256 (authentication)
+   - Redis (caching)
+   - Docker (deployment)
+
+4. TÍNH NĂNG CHÍNH (1 phút):
+   - User registration & login
+   - Bookmark CRUD
+   - Pagination
+   - JWT authentication
+
+5. CÂU HỎIQUA KHÓ (1-1.5 phút):
+   - Authentication flow (vẽ diagram)
+   - Database design
+   - Security measures
+   - Optimization techniques
+
+6. TẬP TRUNG VÀO:
+   - Clean Architecture (lợi ích)
+   - Dependency Injection (testability)
+   - JWT Security (RS256)
+   - Password hashing (bcrypt)
+
+=====================================================================
+✅ ĐIỂM MẠNH CỦA DỰ ÁN (NHẮC NHỞ):
+
+1. KIẾN TRÚC CHUYÊN NGHIỆP:
+   - Clean Architecture (production-ready)
+   - Dependency Injection (testable)
+   - SOLID principles (maintainable)
+
+2. SECURITY:
+   - JWT + RS256 (asymmetric signing)
+   - Bcrypt (password hashing)
+   - User isolation (data privacy)
+   - SQL injection prevention (parameterized queries)
+
+3. QUALITY:
+   - Comprehensive testing (mocked dependencies)
+   - Well-documented (Swagger API docs)
+   - Error handling (custom error types)
+   - Logging (structured with zerolog)
+
+4. DEVOPS:
+   - Docker multi-stage build (optimized image)
+   - Docker Compose (local development)
+   - Database migrations (version control)
+   - Health checks (production ready)
+
+5. PERFORMANCE:
+   - Pagination (reduce memory usage)
+   - Indexes (fast queries)
+   - Redis caching (low latency)
+   - Connection pooling (resource efficient)
+
+=====================================================================
+⚠️ CÁCH TRẢ LỜI NHỮNG CÂU HỎI KHÓ:
+
+Q: "Tại sao lại chọn Go thay vì Python/Node.js?"
+A: "Go có performance cao, concurrency tốt với goroutines, compile sang binary
+   duy nhất (easy to deploy). Perfect cho backend API."
+
+Q: "Tại sao JWT thay vì session-based?"
+A: "JWT là stateless - không cần lưu session trên server, có thể scale across
+   multiple servers. Mobile-friendly. Tuy nhiên không thể revoke immediately."
+
+Q: "Tại sao PostgreSQL thay vì MongoDB?"
+A: "PostgreSQL có ACID transactions và foreign keys (relationships). Tốt cho
+   structured data. MongoDB tốt hơn cho unstructured/hierarchical data."
+
+Q: "Làm sao để improve performance?"
+A: "1. Pagination (avoid loading all records)
+   2. Indexing (index frequently queried columns)
+   3. Caching (Redis for counts, sessions)
+   4. Query optimization (use GORM efficiently)"
+
+Q: "Cách handle errors?"
+A: "Validate input at handler level. Use custom error types. Return
+   meaningful error messages. Log errors for debugging."
+
+=====================================================================
+📚 THỨ TỰ ĐỌC NÊN THEO:
+
+1. Đọc INTERVIEW_CHEATSHEET.md trước (quen với key points)
+2. Đọc INTERVIEW_SCRIPT.md toàn bộ (hiểu sâu hơn)
+3. Xem INTERVIEW_DIAGRAMS.md (visual understanding)
+4. Trở lại INTERVIEW_CHEATSHEET.md (consolidate)
+
+=====================================================================
+🎤 PRACTICE TIPS:
+
+1. Nói to với bạn bè hoặc tập trước gương
+2. Tính thời gian (elevator pitch = 30 giây, full = 8 phút)
+3. Vẽ diagrams trên giấy/bảng trắng
+4. Ghi chú key points lên thẻ flashcard
+5. Quay video tập nói để xem lại
+6. Xin feedback từ senior developers
+
+=====================================================================
+💡 REMEMBER:
+
+✓ Không cần nhớ 100% chi tiết (interviewer cũng không biết hết)
+✓ Hiểu TỔNG QUÁT và CÓ THỂ GIẢI THÍCH là đủ
+✓ Nếu không biết câu gì, nói: "Good question! I didn't implement that..."
+✓ Show enthusiasm for technology & learning
+✓ Tập trung vào quyết định thiết kế & trade-offs
+
+=====================================================================
+🎯 FINAL CHECKLIST:
+
+Trước khi vào phòng interview:
+□ Đọc kỹ INTERVIEW_CHEATSHEET.md
+□ Nhớ elevator pitch
+□ Vẽ được 3 biểu đồ chính
+□ Trả lời được 5 câu hỏi phổ biến
+□ Hiểu tại sao chọn từng technology
+□ Chuẩn bị ví dụ cụ thể (JWT flow, login, etc)
+□ Confident & relaxed
+
+=====================================================================
+
+GỌI GẤP NẾU CẦN:
+- Cần giải thích gì thêm: Xem INTERVIEW_SCRIPT.md
+- Cần nhắc nhanh: Xem INTERVIEW_CHEATSHEET.md
+- Cần vẽ diagram: Xem INTERVIEW_DIAGRAMS.md
+
+HỌC THÊM:
+- Go fundamentals: https://go.dev/doc/
+- Clean Architecture: "Clean Architecture" by Robert C. Martin
+- JWT: https://jwt.io
+- GORM: https://gorm.io
+
+=====================================================================
+Chúc bạn phỏng vấn vui vẻ! 🚀
+
+Nhớ: Tự tin, chuẩn bị kỹ, và thể hiện passion cho technology!

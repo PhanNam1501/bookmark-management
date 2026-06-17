@@ -30,14 +30,20 @@ func NewUrlRedirectWithDB(urlStorage repository.URLStorage, repo repository.Repo
 }
 
 func (u *urlRedirectService) GetRedirectURL(ctx context.Context, code string) (string, error) {
-	// Code length 7 = Redis (URLStorage)
-	if len(code) == 7 {
+	if len(code) == 0 {
+		return "", nil
+	}
+
+	prefix := code[0]
+
+	// Redis prefix: a-g
+	if prefix >= 'a' && prefix <= 'g' {
 		val, err := u.urlStorage.GetRedirectURL(ctx, code)
 		return val, err
 	}
 
-	// Code length 8 = Database (Bookmark)
-	if len(code) == 8 && u.repo != nil {
+	// Database prefix: h-z (Bookmark)
+	if prefix >= 'h' && prefix <= 'z' && u.repo != nil {
 		bookmark, err := u.repo.GetBookmarkByCode(ctx, code)
 		if err != nil {
 			return "", err
